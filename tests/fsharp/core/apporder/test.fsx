@@ -27,13 +27,13 @@ let check (s: string) actual expected =
 let printfn_s (s: string) =
         System.Console.WriteLine("{0}", s)
 
-let printfn_aa_xy (x: int32) (y: int32) =
+let printfn_dd_xy (x: int32) (y: int32) =
         System.Console.WriteLine("x= {0}, y = {1}", x, y)
 
 let printfn_icic_xy (x: IComparable) (y: IComparable) =
         System.Console.WriteLine("x= {0}, y = {1}", x, y)
 
-let printfn_aaa_xycell1 (x: int32) (y: int32) (c: int32) =
+let printfn_ddd_xycell1 (x: int32) (y: int32) (c: int32) =
         System.Console.WriteLine("x = {0}, y = {1}, !cell1 = {2}", x, y, c)
 
 let sprintf_ddddd (a: int32) (b: int32) (c: int32) (d: int32) (e: int32) =
@@ -44,8 +44,8 @@ let check2 s expected actual = check s actual expected
 module CheckMutationOfArgumentValuesInOtherArguments = 
     let test1232() = 
         let mutable cell1 = 1
-        let f1 x = printfn_s "hello"; (fun y -> printfn_aa_xy x y; (x,y))
-        let f2 x y = printfn_aa_xy x y; (x,y)
+        let f1 x = printfn_s "hello"; (fun y -> printfn_dd_xy x y; (x,y))
+        let f2 x y = printfn_dd_xy x y; (x,y)
         cell1 <- 1 // reset
         let res = f1 (cell1 <- 11;  cell1) cell1
         check "test1232 - test1" res (11,11)
@@ -78,8 +78,8 @@ module CheckMutationOfArgumentValuesInOtherArguments =
 
     let test1233() = 
         let cell1 = ref 1
-        let f1 x = cell1 := 4; (fun y -> printfn_aaa_xycell1 x y !cell1; (x,y,!cell1))
-        let f2 x y = printfn_aaa_xycell1 x y !cell1; (x,y,!cell1)
+        let f1 x = cell1 := 4; (fun y -> printfn_ddd_xycell1 x y !cell1; (x,y,!cell1))
+        let f2 x y = printfn_ddd_xycell1 x y !cell1; (x,y,!cell1)
         cell1 := 1
         let res = f1 (cell1 := 11;  !cell1) !cell1
         check "test1233 - test1" res (11,11,4)
@@ -178,8 +178,8 @@ module CheckMutationOfArgumentValuesInOtherArguments =
 module CheckMutationOfArgumentValuesInOtherArgumentsWithIdFunction = 
     let test1232() = 
         let mutable cell1 = 1
-        let f1 x = printfn_s "hello"; (fun y -> printfn_aa_xy x y; (x,y))
-        let f2 x y = printfn_aa_xy x y; (x,y)
+        let f1 x = printfn_s "hello"; (fun y -> printfn_dd_xy x y; (x,y))
+        let f2 x y = printfn_dd_xy x y; (x,y)
         cell1 <- 1 // reset
         let res = id f1 (cell1 <- 11;  cell1) cell1
         check "test1232 - test1" res (11,11)
@@ -212,8 +212,8 @@ module CheckMutationOfArgumentValuesInOtherArgumentsWithIdFunction =
 
     let test1233() = 
         let cell1 = ref 1
-        let f1 x = cell1 := 4; (fun y -> printfn_aaa_xycell1 x y !cell1; (x,y,!cell1))
-        let f2 x y = printfn_aaa_xycell1 x y !cell1; (x,y,!cell1)
+        let f1 x = cell1 := 4; (fun y -> printfn_ddd_xycell1 x y !cell1; (x,y,!cell1))
+        let f2 x y = printfn_ddd_xycell1 x y !cell1; (x,y,!cell1)
         cell1 := 1
         let res = id f1 (cell1 := 11;  !cell1) !cell1
         check "test1233 - test1" res (11,11,4)
