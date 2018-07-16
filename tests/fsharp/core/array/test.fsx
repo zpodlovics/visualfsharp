@@ -26,7 +26,7 @@ let printf_sb_eq (s: string) (b: bool) =
 let sprintf_sdd_an (s: string) (a: int32) (N: int32) =
     System.String.Format("{0}-{1}", s, (a,N))
 
-let sprintf_sddd_anstep (s: string) (a: int32) (step: int32) (N: int32) =
+let sprintf_sddd_astepn (s: string) (a: int32) (step: int32) (N: int32) =
     System.String.Format("{0}-{1}", s ,(a,step,N))
 
 let mutable failures = []
@@ -1294,7 +1294,7 @@ module LoopTests =
        for i in (min a a) ..  step .. (min N N) do
           x <- x + 1
        done;
-       check (sprintf_sddd_anstep "clkrerev95" a step N) x (if step < 0 then (if a < N then 0 else (a - N + abs step) / abs step) else (if N < a then 0 else N - a + step) / step)
+       check (sprintf_sddd_astepn "clkrerev95" a step N) x (if step < 0 then (if a < N then 0 else (a - N + abs step) / abs step) else (if N < a then 0 else N - a + step) / step)
 
     do loop7 0 1 10
     do loop7 0 -1 0
@@ -1380,7 +1380,7 @@ module MoreLoopTestsWithLetBindings =
        for i in (min a a) ..  step .. (min N N) do
           x <- x + 1
        done;
-       check (sprintf_sddd_anstep "ffclkrerev95" a step N) x (if step < 0 then (if a < N then 0 else (a - N + abs step) / abs step) else (if N < a then 0 else N - a + step) / step)
+       check (sprintf_sddd_astepn "ffclkrerev95" a step N) x (if step < 0 then (if a < N then 0 else (a - N + abs step) / abs step) else (if N < a then 0 else N - a + step) / step)
 
     do loop7 0 1 10
     do loop7 0 -1 0
