@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TailCalls>false</TailCalls>
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="test.fsx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.DotNet.ILCompiler" Version="1.0.0-alpha-*" />
+  </ItemGroup>
+
+<PropertyGroup>
+  <DefineConstants Condition=" '$(NETCORERTAPP2_0)' == 'true' ">$(DefineConstants);NETCORERTAPP2_0</DefineConstants>
+</PropertyGroup>
+
+</Project>

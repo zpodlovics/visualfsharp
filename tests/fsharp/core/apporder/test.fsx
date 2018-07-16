@@ -5,6 +5,7 @@ module Core_apporder
 
 #light
 let failures = ref []
+open System
 
 let report_failure (s : string) = 
     stderr.Write" NO: "
@@ -17,17 +18,34 @@ let test s b = if b then () else report_failure(s)
 
 let out r (s:string) = r := !r @ [s]
 
-let check s actual expected = 
-    if actual = expected then printfn "%s: OK" s
-    else report_failure (sprintf "%s: FAILED, expected %A, got %A" s expected actual)
+let check (s: string) actual expected = 
+    if actual = expected then 
+        System.Console.WriteLine("{0}: OK", s)
+    else 
+        report_failure (System.String.Format("{0}: FAILED, expected {1}, got {2}", s, expected, actual))
+
+let printfn_s (s: string) =
+        System.Console.WriteLine("{0}", s)
+
+let printfn_aa_xy (x: int32) (y: int32) =
+        System.Console.WriteLine("x= {0}, y = {1}", x, y)
+
+let printfn_icic_xy (x: IComparable) (y: IComparable) =
+        System.Console.WriteLine("x= {0}, y = {1}", x, y)
+
+let printfn_aaa_xycell1 (x: int32) (y: int32) (c: int32) =
+        System.Console.WriteLine("x = {0}, y = {1}, !cell1 = {2}", x, y, c)
+
+let sprintf_ddddd (a: int32) (b: int32) (c: int32) (d: int32) (e: int32) =
+        System.String.Format("{0} {1} {2} {3} {4}", a, b, c, d, e)
 
 let check2 s expected actual = check s actual expected 
 
 module CheckMutationOfArgumentValuesInOtherArguments = 
     let test1232() = 
         let mutable cell1 = 1
-        let f1 x = printfn "hello"; (fun y -> printfn "x = %A, y = %A" x y; (x,y))
-        let f2 x y = printfn "x = %A, y = %A" x y; (x,y)
+        let f1 x = printfn_s "hello"; (fun y -> printfn_aa_xy x y; (x,y))
+        let f2 x y = printfn_aa_xy x y; (x,y)
         cell1 <- 1 // reset
         let res = f1 (cell1 <- 11;  cell1) cell1
         check "test1232 - test1" res (11,11)
@@ -60,8 +78,8 @@ module CheckMutationOfArgumentValuesInOtherArguments =
 
     let test1233() = 
         let cell1 = ref 1
-        let f1 x = cell1 := 4; (fun y -> printfn "x = %A, y = %A, !cell1 = %A" x y !cell1; (x,y,!cell1))
-        let f2 x y = printfn "x = %A, y = %A, !cell1 = %A" x y !cell1; (x,y,!cell1)
+        let f1 x = cell1 := 4; (fun y -> printfn_aaa_xycell1 x y !cell1; (x,y,!cell1))
+        let f2 x y = printfn_aaa_xycell1 x y !cell1; (x,y,!cell1)
         cell1 := 1
         let res = f1 (cell1 := 11;  !cell1) !cell1
         check "test1233 - test1" res (11,11,4)
@@ -160,8 +178,8 @@ module CheckMutationOfArgumentValuesInOtherArguments =
 module CheckMutationOfArgumentValuesInOtherArgumentsWithIdFunction = 
     let test1232() = 
         let mutable cell1 = 1
-        let f1 x = printfn "hello"; (fun y -> printfn "x = %A, y = %A" x y; (x,y))
-        let f2 x y = printfn "x = %A, y = %A" x y; (x,y)
+        let f1 x = printfn_s "hello"; (fun y -> printfn_aa_xy x y; (x,y))
+        let f2 x y = printfn_aa_xy x y; (x,y)
         cell1 <- 1 // reset
         let res = id f1 (cell1 <- 11;  cell1) cell1
         check "test1232 - test1" res (11,11)
@@ -194,8 +212,8 @@ module CheckMutationOfArgumentValuesInOtherArgumentsWithIdFunction =
 
     let test1233() = 
         let cell1 = ref 1
-        let f1 x = cell1 := 4; (fun y -> printfn "x = %A, y = %A, !cell1 = %A" x y !cell1; (x,y,!cell1))
-        let f2 x y = printfn "x = %A, y = %A, !cell1 = %A" x y !cell1; (x,y,!cell1)
+        let f1 x = cell1 := 4; (fun y -> printfn_aaa_xycell1 x y !cell1; (x,y,!cell1))
+        let f2 x y = printfn_aaa_xycell1 x y !cell1; (x,y,!cell1)
         cell1 := 1
         let res = id f1 (cell1 := 11;  !cell1) !cell1
         check "test1233 - test1" res (11,11,4)
@@ -853,8 +871,8 @@ module DuplicateTestsWithCondensedArgs =
     module CheckMutationOfArgumentValuesInOtherArguments = 
         let test1232() = 
             let mutable cell1 = 1
-            let f1 (x:System.IComparable) = printfn "hello"; (fun (y:System.IComparable) -> printfn "x = %A, y = %A" x y; ((x :?> int),(y :?> int) ))
-            let f2 (x:System.IComparable) (y:System.IComparable) = printfn "x = %A, y = %A" x y; ((x :?> int),(y :?> int) )
+            let f1 (x:System.IComparable) = printfn_s "hello"; (fun (y:System.IComparable) -> printfn_icic_xy x y; ((x :?> int),(y :?> int) ))
+            let f2 (x:System.IComparable) (y:System.IComparable) = printfn_icic_xy x y; ((x :?> int),(y :?> int) )
             cell1 <- 1 // reset
             let res = f1 (cell1 <- 11;  cell1) cell1
             check "test1232 - test1" res (11,11)
@@ -887,8 +905,8 @@ module DuplicateTestsWithCondensedArgs =
 
         let test1233() = 
             let cell1 = ref 1
-            let f1 (x:System.IComparable) = cell1 := 4; printfn "hello"; (fun (y:System.IComparable) -> printfn "x = %A, y = %A" x y; ((x :?> int),(y :?> int),!cell1 ))
-            let f2 (x:System.IComparable) (y:System.IComparable) = printfn "x = %A, y = %A" x y; ((x :?> int),(y :?> int), !cell1 )
+            let f1 (x:System.IComparable) = cell1 := 4; printfn_s "hello"; (fun (y:System.IComparable) -> printfn_icic_xy x y; ((x :?> int),(y :?> int),!cell1 ))
+            let f2 (x:System.IComparable) (y:System.IComparable) = printfn_icic_xy x y; ((x :?> int),(y :?> int), !cell1 )
             cell1 := 1
             let res = f1 (cell1 := 11;  !cell1) !cell1
             check "test1233 - test1" res (11,11,4)
@@ -935,7 +953,7 @@ module MemberAppOrder =
         i
     let foo = new Foo(B=out 5, A=out 4, y=out 2, x=out 3)
     check "cwkneccewi" state [3;2;5;4]
-    check "nvroirv" (sprintf "%d %d %d %d %d" foo.A foo.B foo.X foo.Y foo.Z) "4 5 3 2 99"
+    check "nvroirv" (sprintf_ddddd foo.A foo.B foo.X foo.Y foo.Z) "4 5 3 2 99"
 
 type RecordWithInts = 
     { A : int
