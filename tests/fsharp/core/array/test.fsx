@@ -1,14 +1,40 @@
 // #Conformance #Arrays #Stress #Structs #Mutable #ControlFlow #LetBindings 
+//
+// Please use the following command(s) with to create CoreRT native executable 
+// (where the $TARGET_RID should be replaced with a valid .NET Core and CoreRT supported RID):
+//      dotnet publish -c Release -r $TARGET_RID /p:NETCORERTAPP2_0=true
+// Example generic linux x64 target: 
+//      dotnet publish -c Release -r linux-x64 /p:NETCORERTAPP2_0=true
+
 #if TESTS_AS_APP
 module Core_array
 #endif
 
+let isNonZeroLowerBoundArraySupported = 
+#if NETCORERTAPP2_0
+    false
+#else    
+    true
+#endif
+
+let sprintf_dd_hilo (hi: int32) (lo: int32) =
+    System.String.Format("vre9u0rejkn, lo = {0}, hi = {1}", lo, hi)
+
+let printf_sb_eq (s: string) (b: bool) =
+    System.Console.WriteLine("{0} = {1}", s, b)
+
+let sprintf_sa_n (s: string) (a: int32) (N: int32) =
+    System.String.Format("{0}-{1}", s, (a,N))
+
+let sprintf_sa_nstep (s: string) (a: int32) (step: int32) (N: int32) =
+    System.String.Format("{0}-{1}", s ,(a,step,N))
+
 let mutable failures = []
+
 let report_failure (s) = 
   stderr.WriteLine " NO"; failures <- s :: failures
 let test s b = if not b then (stderr.Write(s:string);   report_failure(s) )
 let check s b1 b2 = test s (b1 = b2)
-
 
 (* TEST SUITE FOR Array *)
 
@@ -287,7 +313,7 @@ let test_sort_by () =
 let test_list_stableSortBy() = 
     for lo in 0 .. 100 do 
       for hi in lo .. 100 do
-         test (sprintf "vre9u0rejkn, lo = %d, hi = %d" lo hi) (List.sortBy snd [ for i in lo .. hi -> (i, i % 17) ] = [ for key in 0 .. 16 do for i in lo .. hi do if i % 17 = key then yield (i, i % 17) ])
+         test (sprintf_dd_hilo lo hi) (List.sortBy snd [ for i in lo .. hi -> (i, i % 17) ] = [ for key in 0 .. 16 do for i in lo .. hi do if i % 17 = key then yield (i, i % 17) ])
 
 test_list_stableSortBy()         
 
@@ -319,14 +345,14 @@ type Key =
 let test_list_stableSort() = 
     for lo in 0 .. 100 do 
       for hi in lo .. 100 do
-         test (sprintf "vre9u0rejkn, lo = %d, hi = %d" lo hi) (List.sort [ for i in lo .. hi -> Key(i, i % 17) ] = [ for key in 0 .. 16 do for i in lo .. hi do if i % 17 = key then yield Key(i, i % 17) ])
+         test (sprintf_dd_hilo lo hi) (List.sort [ for i in lo .. hi -> Key(i, i % 17) ] = [ for key in 0 .. 16 do for i in lo .. hi do if i % 17 = key then yield Key(i, i % 17) ])
 
 test_list_stableSort()         
 
 let test_list_stableSortByNonIntegerKey() = 
     for lo in 0 .. 100 do 
       for hi in lo .. 100 do
-         test (sprintf "vre9u0rejkn, lo = %d, hi = %d" lo hi) (List.sortBy (fun (Key(a,b)) -> Key(0,b)) [ for i in lo .. hi -> Key(i, i % 17) ] = [ for key in 0 .. 16 do for i in lo .. hi do if i % 17 = key then yield Key(i, i % 17) ])
+         test (sprintf_dd_hilo lo hi) (List.sortBy (fun (Key(a,b)) -> Key(0,b)) [ for i in lo .. hi -> Key(i, i % 17) ] = [ for key in 0 .. 16 do for i in lo .. hi do if i % 17 = key then yield Key(i, i % 17) ])
 
 test_list_stableSortByNonIntegerKey()         
 
@@ -634,7 +660,8 @@ module ArrayNonZeroBasedTestsSlice =
     test "fewoih16" (arr3d.[5,4,3] =  (0,0,0))
     test "fewoih16" (arr3d.[5,5,3] =  (0,1,0))
     test "fewoih16" (arr3d.[6,5,3] =  (0,1,1))
-  let _ = runTest()
+  let _ = 
+    if isNonZeroLowerBoundArraySupported then runTest()
 
 module Array3Tests = begin
 
@@ -713,25 +740,25 @@ module SeqCacheAllTest =
        let test0 = (!count = 0)
        let e1 = s.GetEnumerator()
        let test1 = (!count = 0)
-       printf "test1 = %b\n" test1;
+       printf_sb_eq "test1" test1;
        for i = 1 to 1 do (e1.MoveNext() |> ignore; e1.Current |> ignore)
        let test2 = (!count = 1)
-       printf "test2 = %b\n" test2;
+       printf_sb_eq "test2" test2;
        let e2 = s.GetEnumerator()
        for i = 1 to 5 do (e2.MoveNext() |> ignore; e2.Current |> ignore)
        let test3 = (!count = 5)
-       printf "test3 = %b\n" test3;
+       printf_sb_eq "test3" test3;
        let e3 = s.GetEnumerator()
        for i = 1 to 5 do (e3.MoveNext() |> ignore; e3.Current |> ignore)
        let test4 = (!count = 5)
-       printf "test4 = %b\n" test4;
+       printf_sb_eq "test4" test4;
        let e4 = s.GetEnumerator()
        for i = 1 to 3 do (e4.MoveNext() |> ignore; e4.Current |> ignore)
        let test5 = (!count = 5)
-       printf "test5 = %b\n" test5;
+       printf_sb_eq "test5" test5;
 
        let test6 = [ for x in s -> x ] = [ 0 .. 10 ]
-       printf "test6 = %b\n" test6;
+       printf_sb_eq "test6" test6;
        for x in s do ()
        let test7 = (!count = 11)
        let test8 = [ for x in s -> x ] = [ 0 .. 10 ]
@@ -1213,7 +1240,7 @@ module LoopTests =
        for i in (min a a) ..  N do
           x <- x + 1
        done;
-       check (sprintf "clkrerev90-%A" (a,N)) x  (if N < a then 0 else N - a + 1) 
+       check (sprintf_sa_n "clkrerev90" a N) x  (if N < a then 0 else N - a + 1) 
 
 
     do loop3 0 10
@@ -1226,7 +1253,7 @@ module LoopTests =
        for i in OperatorIntrinsics.RangeInt32 a 1 N do
           x <- x + 1
        done;
-       check (sprintf "clkrerev91-%A" (a,N)) x (if N < a then 0 else N - a + 1) 
+       check (sprintf_sa_n "clkrerev91" a N) x (if N < a then 0 else N - a + 1) 
 
     do loop4 0 10
     do loop4 0 0
@@ -1239,7 +1266,7 @@ module LoopTests =
        for i in (min a a) ..  2 .. (min N N) do
           x <- x + 1
        done;
-       check (sprintf "clkrerev92-%A" (a,N))  x ((if N < a then 0 else N - a + 2) / 2)
+       check (sprintf_sa_n "clkrerev92" a N)  x ((if N < a then 0 else N - a + 2) / 2)
 
     do loop5 0 10
     do loop5 0 0
@@ -1253,7 +1280,7 @@ module LoopTests =
        for i in (min a a) ..  200 .. (min N N) do
           x <- x + 1
        done;
-       check (sprintf "clkrerev93-%A" (a,N)) x ((if N < a then 0 else N - a + 200) / 200)
+       check (sprintf_sa_n "clkrerev93" a N) x ((if N < a then 0 else N - a + 200) / 200)
 
     do loop6 0 10
     do loop6 0 0
@@ -1267,7 +1294,7 @@ module LoopTests =
        for i in (min a a) ..  step .. (min N N) do
           x <- x + 1
        done;
-       check (sprintf "clkrerev95-%A" (a,step,N)) x (if step < 0 then (if a < N then 0 else (a - N + abs step) / abs step) else (if N < a then 0 else N - a + step) / step)
+       check (sprintf_sa_nstep "clkrerev95" a step N) x (if step < 0 then (if a < N then 0 else (a - N + abs step) / abs step) else (if N < a then 0 else N - a + step) / step)
 
     do loop7 0 1 10
     do loop7 0 -1 0
@@ -1280,7 +1307,7 @@ module LoopTests =
        for i in (min a a) ..  -1 .. (min N N) do
           x <- x + 1
        done;
-       check (sprintf "clkrerev96-%A" (a,N))  x (abs (if a < N then 0 else (a - N + 1) / 1))
+       check (sprintf_sa_n "clkrerev96" a N)  x (abs (if a < N then 0 else (a - N + 1) / 1))
 
     do loop8 0 10
     do loop8 0 0
@@ -1295,7 +1322,7 @@ module MoreLoopTestsWithLetBindings =
        for i in (min a a) ..  (min N N) do
           x <- x + 1
        done;
-       check (sprintf "ffclkrerev90-%A" (a,N)) x  (if N < a then 0 else N - a + 1) 
+       check (sprintf_sa_n "ffclkrerev90" a N) x  (if N < a then 0 else N - a + 1) 
 
 
     do loop3 0 10
@@ -1309,7 +1336,7 @@ module MoreLoopTestsWithLetBindings =
        for i in OperatorIntrinsics.RangeInt32 a 1 N do
           x <- x + 1
        done;
-       check (sprintf "ffclkrerev91-%A" (a,N)) x (if N < a then 0 else N - a + 1) 
+       check (sprintf_sa_n "ffclkrerev91" a N) x (if N < a then 0 else N - a + 1) 
 
     do loop4 0 10
     do loop4 0 0
@@ -1323,7 +1350,7 @@ module MoreLoopTestsWithLetBindings =
        for i in (min a a) ..  2 .. (min N N) do
           x <- x + 1
        done;
-       check (sprintf "ffclkrerev92-%A" (a,N))  x ((if N < a then 0 else N - a + 2) / 2)
+       check (sprintf_sa_n "ffclkrerev92" a N)  x ((if N < a then 0 else N - a + 2) / 2)
 
     do loop5 0 10
     do loop5 0 0
@@ -1338,7 +1365,7 @@ module MoreLoopTestsWithLetBindings =
        for i in (min a a) ..  200 .. (min N N) do
           x <- x + 1
        done;
-       check (sprintf "ffclkrerev93-%A" (a,N)) x ((if N < a then 0 else N - a + 200) / 200)
+       check (sprintf_sa_n "ffclkrerev93" a N) x ((if N < a then 0 else N - a + 200) / 200)
 
     do loop6 0 10
     do loop6 0 0
@@ -1353,7 +1380,7 @@ module MoreLoopTestsWithLetBindings =
        for i in (min a a) ..  step .. (min N N) do
           x <- x + 1
        done;
-       check (sprintf "ffclkrerev95-%A" (a,step,N)) x (if step < 0 then (if a < N then 0 else (a - N + abs step) / abs step) else (if N < a then 0 else N - a + step) / step)
+       check (sprintf_sa_nstep "ffclkrerev95" a step N) x (if step < 0 then (if a < N then 0 else (a - N + abs step) / abs step) else (if N < a then 0 else N - a + step) / step)
 
     do loop7 0 1 10
     do loop7 0 -1 0
@@ -1367,7 +1394,7 @@ module MoreLoopTestsWithLetBindings =
        for i in (min a a) ..  -1 .. (min N N) do
           x <- x + 1
        done;
-       check (sprintf "ffclkrerev96-%A" (a,N))  x (abs (if a < N then 0 else (a - N + 1) / 1))
+       check (sprintf_sa_n "ffclkrerev96" a N)  x (abs (if a < N then 0 else (a - N + 1) / 1))
 
     do loop8 0 10
     do loop8 0 0
@@ -1469,7 +1496,7 @@ module manyIndexes =
         0
 
 
-#if !NETCOREAPP1_0
+#if !NETCOREAPP1_0 && !NETCORERTAPP2_0
 module bug6447 =
     let a = System.Array.CreateInstance(typeof<int>, [|1|], [|1|])
     let a1 = System.Array.CreateInstance(typeof<int>, [|1|], [|3|])
