@@ -23,10 +23,10 @@ let sprintf_dd_hilo (hi: int32) (lo: int32) =
 let printf_sb_eq (s: string) (b: bool) =
     System.Console.WriteLine("{0} = {1}", s, b)
 
-let sprintf_sa_n (s: string) (a: int32) (N: int32) =
+let sprintf_sdd_an (s: string) (a: int32) (N: int32) =
     System.String.Format("{0}-{1}", s, (a,N))
 
-let sprintf_sa_nstep (s: string) (a: int32) (step: int32) (N: int32) =
+let sprintf_sddd_anstep (s: string) (a: int32) (step: int32) (N: int32) =
     System.String.Format("{0}-{1}", s ,(a,step,N))
 
 let mutable failures = []
@@ -1240,7 +1240,7 @@ module LoopTests =
        for i in (min a a) ..  N do
           x <- x + 1
        done;
-       check (sprintf_sa_n "clkrerev90" a N) x  (if N < a then 0 else N - a + 1) 
+       check (sprintf_sdd_an "clkrerev90" a N) x  (if N < a then 0 else N - a + 1) 
 
 
     do loop3 0 10
@@ -1253,7 +1253,7 @@ module LoopTests =
        for i in OperatorIntrinsics.RangeInt32 a 1 N do
           x <- x + 1
        done;
-       check (sprintf_sa_n "clkrerev91" a N) x (if N < a then 0 else N - a + 1) 
+       check (sprintf_sdd_an "clkrerev91" a N) x (if N < a then 0 else N - a + 1) 
 
     do loop4 0 10
     do loop4 0 0
@@ -1266,7 +1266,7 @@ module LoopTests =
        for i in (min a a) ..  2 .. (min N N) do
           x <- x + 1
        done;
-       check (sprintf_sa_n "clkrerev92" a N)  x ((if N < a then 0 else N - a + 2) / 2)
+       check (sprintf_sdd_an "clkrerev92" a N)  x ((if N < a then 0 else N - a + 2) / 2)
 
     do loop5 0 10
     do loop5 0 0
@@ -1280,7 +1280,7 @@ module LoopTests =
        for i in (min a a) ..  200 .. (min N N) do
           x <- x + 1
        done;
-       check (sprintf_sa_n "clkrerev93" a N) x ((if N < a then 0 else N - a + 200) / 200)
+       check (sprintf_sdd_an "clkrerev93" a N) x ((if N < a then 0 else N - a + 200) / 200)
 
     do loop6 0 10
     do loop6 0 0
@@ -1294,7 +1294,7 @@ module LoopTests =
        for i in (min a a) ..  step .. (min N N) do
           x <- x + 1
        done;
-       check (sprintf_sa_nstep "clkrerev95" a step N) x (if step < 0 then (if a < N then 0 else (a - N + abs step) / abs step) else (if N < a then 0 else N - a + step) / step)
+       check (sprintf_sddd_anstep "clkrerev95" a step N) x (if step < 0 then (if a < N then 0 else (a - N + abs step) / abs step) else (if N < a then 0 else N - a + step) / step)
 
     do loop7 0 1 10
     do loop7 0 -1 0
@@ -1307,7 +1307,7 @@ module LoopTests =
        for i in (min a a) ..  -1 .. (min N N) do
           x <- x + 1
        done;
-       check (sprintf_sa_n "clkrerev96" a N)  x (abs (if a < N then 0 else (a - N + 1) / 1))
+       check (sprintf_sdd_an "clkrerev96" a N)  x (abs (if a < N then 0 else (a - N + 1) / 1))
 
     do loop8 0 10
     do loop8 0 0
@@ -1322,7 +1322,7 @@ module MoreLoopTestsWithLetBindings =
        for i in (min a a) ..  (min N N) do
           x <- x + 1
        done;
-       check (sprintf_sa_n "ffclkrerev90" a N) x  (if N < a then 0 else N - a + 1) 
+       check (sprintf_sdd_an "ffclkrerev90" a N) x  (if N < a then 0 else N - a + 1) 
 
 
     do loop3 0 10
@@ -1336,7 +1336,7 @@ module MoreLoopTestsWithLetBindings =
        for i in OperatorIntrinsics.RangeInt32 a 1 N do
           x <- x + 1
        done;
-       check (sprintf_sa_n "ffclkrerev91" a N) x (if N < a then 0 else N - a + 1) 
+       check (sprintf_sdd_an "ffclkrerev91" a N) x (if N < a then 0 else N - a + 1) 
 
     do loop4 0 10
     do loop4 0 0
@@ -1350,7 +1350,7 @@ module MoreLoopTestsWithLetBindings =
        for i in (min a a) ..  2 .. (min N N) do
           x <- x + 1
        done;
-       check (sprintf_sa_n "ffclkrerev92" a N)  x ((if N < a then 0 else N - a + 2) / 2)
+       check (sprintf_sdd_an "ffclkrerev92" a N)  x ((if N < a then 0 else N - a + 2) / 2)
 
     do loop5 0 10
     do loop5 0 0
@@ -1365,7 +1365,7 @@ module MoreLoopTestsWithLetBindings =
        for i in (min a a) ..  200 .. (min N N) do
           x <- x + 1
        done;
-       check (sprintf_sa_n "ffclkrerev93" a N) x ((if N < a then 0 else N - a + 200) / 200)
+       check (sprintf_sdd_an "ffclkrerev93" a N) x ((if N < a then 0 else N - a + 200) / 200)
 
     do loop6 0 10
     do loop6 0 0
@@ -1380,7 +1380,7 @@ module MoreLoopTestsWithLetBindings =
        for i in (min a a) ..  step .. (min N N) do
           x <- x + 1
        done;
-       check (sprintf_sa_nstep "ffclkrerev95" a step N) x (if step < 0 then (if a < N then 0 else (a - N + abs step) / abs step) else (if N < a then 0 else N - a + step) / step)
+       check (sprintf_sddd_anstep "ffclkrerev95" a step N) x (if step < 0 then (if a < N then 0 else (a - N + abs step) / abs step) else (if N < a then 0 else N - a + step) / step)
 
     do loop7 0 1 10
     do loop7 0 -1 0
@@ -1394,7 +1394,7 @@ module MoreLoopTestsWithLetBindings =
        for i in (min a a) ..  -1 .. (min N N) do
           x <- x + 1
        done;
-       check (sprintf_sa_n "ffclkrerev96" a N)  x (abs (if a < N then 0 else (a - N + 1) / 1))
+       check (sprintf_sdd_an "ffclkrerev96" a N)  x (abs (if a < N then 0 else (a - N + 1) / 1))
 
     do loop8 0 10
     do loop8 0 0
